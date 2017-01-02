@@ -4,7 +4,7 @@ import sys
 
 class UploadTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
-        file = open('pythonfile.blk', 'wb+')
+        file = open('pythonfile1.blk', 'wb+')
         while True:
             print 'new send'
             self.data = self.request.recv(1024*1024*64)

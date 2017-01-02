@@ -42,15 +42,27 @@
 
 
 from SimpleXMLRPCServer import SimpleXMLRPCServer
+chunk_size = 1024 * 1024 * 64
 
-
-def put(name):
+def _put(name, size):
     #TODO add entry
 
-    return [['localhost', 6001], ['localhost', 6002]]
+    return [['localhost', 6001, (size/chunk_size)/2+1], ['localhost', 6002, (size/chunk_size)/2+1]]
+
+def _get(name, size):
+    return [['localhost', 6003, [1]], ['localhost', 6004, [1]]]
+
+def _update():
+    pass
+
+def _sendMeta():
+    pass
 
 server = SimpleXMLRPCServer(('localhost', 6000))
 print "Listening on port 6000..."
 server.register_multicall_functions()
-server.register_function(put, 'put')
+server.register_function(_put, '_put')
+server.register_function(_get, '_get')
+server.register_function(_update, '_update')
+server.register_function(_sendMeta, '_sendMeta')
 server.serve_forever()

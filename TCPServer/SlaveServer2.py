@@ -42,14 +42,23 @@
 
 import SocketServer
 import sys
+import time
+import os
 
-
+absPath = '/hadoop2'
 
 class UploadTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
-        file = open('pythonfile.blk', 'wb+')
+        for i in range(1, 10):
+            _path = absPath + '/block' + str(i)
+            if not os.path.exists(_path):
+                os.makedirs(_path)
+                break
+        _timestamp = int(time.time())
+        _fileName = _path + '/' + str(_timestamp) + '.blk'
+        file = open(_fileName, 'wb+')
         while True:
-            print 'new send'
+            print 'new send2'
             self.data = self.request.recv(1024*1024*64)
             print sys.getsizeof(self.data)
             if sys.getsizeof(self.data) == 37:
@@ -59,11 +68,12 @@ class UploadTCPHandler(SocketServer.BaseRequestHandler):
         file.close()
 
 if __name__ == "__main__":
-    HOST, PORT = "localhost", 6001
+    HOST, PORT = "localhost", 6002
 
     # Create the server, binding to localhost on port 9999
     server = SocketServer.TCPServer((HOST, PORT), UploadTCPHandler)
-
+    if not os.path.exists(absPath):
+        os.makedirs(absPath)
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
     server.serve_forever()
