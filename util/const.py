@@ -1,16 +1,10 @@
-# -*- coding: UTF-8 -*-
-import sys
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
-
-class const(object):
-    class ConstError(TypeError):
-        pass
-
-    def __setattr__(self, name, value):
-        if name in self.__dict__:
-            raise self.ConstError, "can't change const.%s" % name
-
-        self.__dict__[name] = value
-
-
-sys.modules[__name__] = const()
+chunk_size = 67108864
+abs_path = '/hadoop/data'
+upload_port = 7000
+download_port = 8000
+rpc_port = 6001
+master_port = 6000
+task_port = 6002

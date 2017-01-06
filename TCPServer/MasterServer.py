@@ -40,25 +40,45 @@
 #
 #     server.shutdown()
 
-
+import Queue
+from util import const
 from SimpleXMLRPCServer import SimpleXMLRPCServer
-chunk_size = 1024 * 1024 * 64
+from multiprocessing.managers import BaseManager
+from util import const
+
 
 def _put(name, size):
     #TODO add entry
 
-    return [['localhost', 6001, (size/chunk_size)/2+1], ['localhost', 6002, (size/chunk_size)/2+1]]
+    return [['localhost', [1, 2, 3, 4, 5, 6]]]
+
 
 def _get(name, size):
-    return [['localhost', 6003, [1]], ['localhost', 6004, [1]]]
+
+    return [['localhost', [1, 2, 3, 4, 5, 6]]]
+
 
 def _update():
     pass
 
+
 def _sendMeta():
     pass
 
-server = SimpleXMLRPCServer(('localhost', 6000))
+task_queue = Queue.Queue()
+
+
+class QueueManager(BaseManager):
+    pass
+
+QueueManager.register('get_task_queue', callable=lambda: task_queue)
+manager = QueueManager(address=('', const.task_port), authkey='abc')
+manager.start()
+
+task = manager.get_task_queue()
+
+
+server = SimpleXMLRPCServer(('localhost', const.rpc_port))
 print "Listening on port 6000..."
 server.register_multicall_functions()
 server.register_function(_put, '_put')

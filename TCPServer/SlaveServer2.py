@@ -44,8 +44,10 @@ import SocketServer
 import sys
 import time
 import os
+from util import file_chunk
 
 absPath = '/hadoop2'
+
 
 class UploadTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):

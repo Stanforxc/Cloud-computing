@@ -1,14 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import os
+from util import const
+#import util.const as const
 
-t = [1, 2, 3, 4]
+from util import *
+# from util import dcf
 
-def fib(max):
-    n, a, b = 0, 0, 1
-    while n < max-2:
-        yield b
-        a, b = b, a + b
-        n = n + 1
-
-for t in fib(6):
-    print t
+# print util.abc
+# print dcf
+print dir()
+#
+if not os.listdir(const.abs_path + '/block' + str(1)):
+    print 'in'

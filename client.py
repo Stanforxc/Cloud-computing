@@ -2,61 +2,79 @@
 # -*- coding: utf-8 -*-
 import socket
 import xmlrpclib
-import os
+import os, sys
+from util import const
+from util import file_chunk
 
 
+_file = open('/home/huang/Downloads/VMware-Workstation-Full-12.5.2-4638234.x86_64.bundle', 'rb')
 
+size = os.path.getsize('/home/huang/Downloads/VMware-Workstation-Full-12.5.2-4638234.x86_64.bundle')
 
-_file = open('/home/huang/Desktop/CentOS-7-x86_64-Minimal-1511.iso', 'rb')
-
-size = os.path.getsize('/home/huang/Desktop/CentOS-7-x86_64-Minimal-1511.iso')
-
-proxy = xmlrpclib.ServerProxy("http://localhost:6000/")
-
+proxy = xmlrpclib.ServerProxy("http://localhost:%d" % const.rpc_port)
 addrs = proxy._put('df', size)
 print tuple(addrs)
 
+proxy2 = xmlrpclib.ServerProxy("http://localhost:%d" % 10000)
 
-def read_in_chunks(_file, chunk_size):
+#
+# def read_in_chunks(_file, chunk_size):
+#
+#     while True:
+#         chunk_data = _file.read(chunk_size)
+#
+#         # if not chunk_data:
+#         #     break
+#         yield chunk_data
+#
+#
+#     # Connect to server and send data
 
-    while True:
-        chunk_data = _file.read(chunk_size)
 
-        # if not chunk_data:
-        #     break
-        yield chunk_data
+# for addr in addrs:
+#     try:
+#         i = 0
+#         for chunk in file_chunk.read_in_chunks(_file, const.chunk_size):
+#             if i == len(addr[1]):
+#                 break
+#             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#             print addr[1][i]
+#             port = proxy2._write(addr[1][i])
+#             i += 1
+#             print port
+#             sock.connect((addr[0], port))
+#             print _file.tell()
+#             sock.sendall(chunk)
+#     finally:
+#         sock.close()
 
 
-    # Connect to server and send data
-
-
-for addr in addrs:
-    chunk_data = 0
-    chunk_size = 1024 * 1024 * 64
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((addr[0], addr[1]))
-        i = 0
-        for chunk in read_in_chunks(_file, chunk_size):
-            print _file.tell()
-            if i == addr[2]-1:
-                chunk_data = chunk
-                break
-            i = i + 1
-            sock.sendall(chunk)
-        sock.sendall(chunk_data)
-    finally:
-        sock.close()
 
 addrs = proxy._get('df', size)
+_file2 = open('/home/huang/Downloads/test.bundle', 'wb+')
+
 
 for addr in addrs:
-    chunk_data = 0
-    chunk_size = 1024 * 1024 * 64
     try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((addr[0], addr[1]))
+        for i in addr[1]:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            print i
+            size = 0
+            port = proxy2._read(i)
+            sock.connect((addr[0], port))
+            sock.send('daf')
+            while True:
+                try:
+                    data = sock.recv(const.chunk_size)
 
-        sock.recv()
+                    size += sys.getsizeof(data)
+                    print size
+                    _file2.write(data)
+                    _file2.flush()
+                except:
+                    sock.close()
+                    print size
+                    break
     finally:
         sock.close()
+        _file2.close()
