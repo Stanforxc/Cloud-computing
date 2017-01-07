@@ -1,3 +1,3 @@
 from const import *
 
-__all__ = ['file_chunk','const', 'block_ope']
+__all__ = ['file_ope', 'config_ope', 'const', 'block_ope']

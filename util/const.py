@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 chunk_size = 67108864
-abs_path = '/hadoop/data'
+abs_path = '/hadoop'
 upload_port = 7000
 download_port = 8000
 rpc_port = 6001

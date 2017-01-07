@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import socket
 import xmlrpclib
 import os, sys
 from util import const
-from util import file_chunk
+from util import file_ope
 
 
 _file = open('/home/huang/Downloads/VMware-Workstation-Full-12.5.2-4638234.x86_64.bundle', 'rb')
@@ -17,16 +18,7 @@ print tuple(addrs)
 
 proxy2 = xmlrpclib.ServerProxy("http://localhost:%d" % 10000)
 
-#
-# def read_in_chunks(_file, chunk_size):
-#
-#     while True:
-#         chunk_data = _file.read(chunk_size)
-#
-#         # if not chunk_data:
-#         #     break
-#         yield chunk_data
-#
+
 #
 #     # Connect to server and send data
 
@@ -66,15 +58,18 @@ for addr in addrs:
             while True:
                 try:
                     data = sock.recv(const.chunk_size)
-
-                    size += sys.getsizeof(data)
+                    size = sys.getsizeof(data)
                     print size
+                    if size == 37:
+                        break
                     _file2.write(data)
                     _file2.flush()
                 except:
+                    #sock.shutdown(socket.SHUT_WR)
                     sock.close()
                     print size
                     break
+            #sock.shutdown(socket.SHUT_WR)
+            sock.close()
     finally:
-        sock.close()
         _file2.close()

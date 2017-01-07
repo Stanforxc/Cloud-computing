@@ -44,7 +44,7 @@ import SocketServer
 import sys
 import time
 import os
-from util import file_chunk
+from util import file_ope
 
 absPath = '/hadoop2'
 

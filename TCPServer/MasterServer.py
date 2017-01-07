@@ -40,49 +40,86 @@
 #
 #     server.shutdown()
 
-import Queue
-from util import const
 from SimpleXMLRPCServer import SimpleXMLRPCServer
-from multiprocessing.managers import BaseManager
-from util import const
+from util import const, config_ope, file_ope, meta_ope
+import cPickle as pickle
+from SlaveServer import SlaveServer
+import xmlrpclib
+
+global masterServer
+
+
+class MasterServer:
+    def __init__(self):
+        self.num_slaves = 4
+        self.replication = 2
+        self.entries = []
+        self.slaves = []
+        self.bitmap = []
+        s_f = config_ope.read_slaves()
+        for slave in file_ope.read_in_lines(s_f):
+            self.slaves.append(slave)
+            proxy = xmlrpclib.ServerProxy("http://%s:%d" % (slave, const.rpc_port))
+            self.bitmap.append(proxy.get_meta())
+
+
+def get_unuse(_blks, _num):
+    res = []
+    for i in range(0, len(_blks)):
+        if _blks[i] == 0:
+            res.append(i)
+            if len(res) == _num:
+                break
+    return res
 
 
 def _put(name, size):
-    #TODO add entry
+    result = []
+    blk_num = size / const.chunk_size if size % const.chunk_size == 0 else size / const.chunk_size + 1
+    temp = blk_num / masterServer.num_slaves
+    delt = 0
+    for i in range(0, masterServer.num_slaves):
+        if delt == 0:
+            res = get_unuse(masterServer.bitmap[i], temp)
+            delt = temp - len(res)
+        else:
+            res = get_unuse(masterServer.bitmap[i], temp + delt)
+            delt = temp + delt - len(res)
 
-    return [['localhost', [1, 2, 3, 4, 5, 6]]]
+        result.append([masterServer.slaves[i], res])
+    if delt > 0:
+        return -1
+
+    else:
+        masterServer.entries.append({name: result})
+        return result
 
 
-def _get(name, size):
-
-    return [['localhost', [1, 2, 3, 4, 5, 6]]]
+def _get(name):
+    return masterServer.entries[name]
 
 
 def _update():
     pass
 
 
-def _sendMeta():
+def _send_meta():
     pass
 
-task_queue = Queue.Queue()
 
-
-class QueueManager(BaseManager):
-    pass
-
-QueueManager.register('get_task_queue', callable=lambda: task_queue)
-manager = QueueManager(address=('', const.task_port), authkey='abc')
-manager.start()
-
-task = manager.get_task_queue()
-
-
-server = SimpleXMLRPCServer(('localhost', const.rpc_port))
-print "Listening on port 6000..."
-server.register_multicall_functions()
-server.register_function(_put, '_put')
-server.register_function(_get, '_get')
-server.register_function(_update, '_update')
-server.register_function(_sendMeta, '_sendMeta')
-server.serve_forever()
+if __name__ == "__main__":
+    config_ope.create_config()
+    meta_ope.create_meta()
+    try:
+        f = open('fsimage', 'rb')
+        masterServer = pickle.load(f)
+    except:
+        masterServer = MasterServer()
+    server = SimpleXMLRPCServer(('localhost', const.rpc_port))
+    print "Listening on port 6000..."
+    server.register_multicall_functions()
+    server.register_function(_put, '_put')
+    server.register_function(_get, '_get')
+    server.register_function(_update, '_update')
+    server.register_function(_send_meta, '_send_meta')
+    server.serve_forever()
