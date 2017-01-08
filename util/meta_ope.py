@@ -16,13 +16,11 @@ def create_meta():
     if not os.path.exists(prefix_path):
         os.makedirs(prefix_path)
 
-def read_master():
-    _path = prefix_path + '/master'
+
+def read_fsimage():
+    _path = prefix_path + '/fsimage'
     return open(_path, 'rb')
 
-
-def read_slaves():
-    _path = prefix_path + '/slaves'
-    return open(_path, 'rb')
-
-
+def write_fsimage():
+    _path = prefix_path + '/fsimage'
+    return open(_path, 'wb')

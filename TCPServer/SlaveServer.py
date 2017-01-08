@@ -18,7 +18,7 @@ class SlaveServer:
         self.bitmap = [0] * self.num_blocks
         for i in range(1, self.num_blocks + 1):
             if block_ope.inuse_block(i):
-                self.bitmap[i] = 1
+                self.bitmap[i-1] = 1
 
 
 
@@ -117,6 +117,7 @@ if __name__ == "__main__":
     server = SimpleXMLRPCServer(('localhost', 10000))
     server.register_function(_write, '_write')
     server.register_function(_read, '_read')
+    server.register_function(get_meta, 'get_meta')
     server.serve_forever()
 
 

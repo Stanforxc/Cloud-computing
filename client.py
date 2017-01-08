@@ -19,14 +19,14 @@ print tuple(addrs)
 proxy2 = xmlrpclib.ServerProxy("http://localhost:%d" % 10000)
 
 
-#
-#     # Connect to server and send data
+
+    # Connect to server and send data
 
 
 # for addr in addrs:
 #     try:
 #         i = 0
-#         for chunk in file_chunk.read_in_chunks(_file, const.chunk_size):
+#         for chunk in file_ope.read_in_chunks(_file, const.chunk_size):
 #             if i == len(addr[1]):
 #                 break
 #             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -42,7 +42,7 @@ proxy2 = xmlrpclib.ServerProxy("http://localhost:%d" % 10000)
 
 
 
-addrs = proxy._get('df', size)
+addrs = proxy._get('df')
 _file2 = open('/home/huang/Downloads/test.bundle', 'wb+')
 
 

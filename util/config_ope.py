@@ -9,7 +9,7 @@ from util import const, file_ope
 
 
 user = getpass.getuser()
-prefix_path = '/home/' + user + const.abs_path + '/config'
+prefix_path = '/home/' + user + const.abs_path + '/etc/conf'
 
 
 def create_config():

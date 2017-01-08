@@ -51,15 +51,19 @@ global masterServer
 
 class MasterServer:
     def __init__(self):
-        self.num_slaves = 4
+        self.num_slaves = 0
         self.replication = 2
-        self.entries = []
+        self.entries = {}
         self.slaves = []
         self.bitmap = []
         s_f = config_ope.read_slaves()
         for slave in file_ope.read_in_lines(s_f):
+            slave = slave.strip('\n')
+            if len(slave) == 0:
+                break
+            self.num_slaves += 1
             self.slaves.append(slave)
-            proxy = xmlrpclib.ServerProxy("http://%s:%d" % (slave, const.rpc_port))
+            proxy = xmlrpclib.ServerProxy("http://%s:%d" % (slave, 10000))
             self.bitmap.append(proxy.get_meta())
 
 
@@ -67,7 +71,7 @@ def get_unuse(_blks, _num):
     res = []
     for i in range(0, len(_blks)):
         if _blks[i] == 0:
-            res.append(i)
+            res.append(i + 1)
             if len(res) == _num:
                 break
     return res
@@ -91,7 +95,8 @@ def _put(name, size):
         return -1
 
     else:
-        masterServer.entries.append({name: result})
+        masterServer.entries[name] = result
+
         return result
 
 
@@ -111,8 +116,8 @@ if __name__ == "__main__":
     config_ope.create_config()
     meta_ope.create_meta()
     try:
-        f = open('fsimage', 'rb')
-        masterServer = pickle.load(f)
+        f = meta_ope.read_fsimage()
+        masterServer.entries = pickle.load(f)
     except:
         masterServer = MasterServer()
     server = SimpleXMLRPCServer(('localhost', const.rpc_port))
