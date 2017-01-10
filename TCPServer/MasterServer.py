@@ -40,6 +40,9 @@
 #
 #     server.shutdown()
 
+import sys
+import os
+sys.path.append(os.getcwd())
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from util import const, config_ope, file_ope, meta_ope
 import cPickle as pickle
@@ -63,7 +66,7 @@ class MasterServer:
                 break
             self.num_slaves += 1
             self.slaves.append(slave)
-            proxy = xmlrpclib.ServerProxy("http://%s:%d" % (slave, 10000))
+            proxy = xmlrpclib.ServerProxy("http://%s:%d" % (slave, 10000+self.num_slaves))
             self.bitmap.append(proxy.get_meta())
 
 

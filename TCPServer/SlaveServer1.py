@@ -117,7 +117,7 @@ if __name__ == "__main__":
         block_ope.create_block(i)
     config_ope.create_config()
     slaveServer = SlaveServer()
-    server = SimpleXMLRPCServer(('localhost', 10001))
+    server = SimpleXMLRPCServer(('localhost', 10002))
     server.register_function(_write, '_write')
     server.register_function(_read, '_read')
     server.register_function(get_meta, 'get_meta')

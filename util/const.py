@@ -5,6 +5,6 @@ chunk_size = 67108864
 abs_path = '/hadoop'
 upload_port = 7000
 download_port = 8000
-rpc_port = 6001
+rpc_port = 10000
 master_port = 6000
 task_port = 6002
